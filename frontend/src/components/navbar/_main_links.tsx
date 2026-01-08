@@ -2,7 +2,6 @@ import { Center, Divider, Group, Tooltip, UnstyledButton } from '@mantine/core';
 import {
   Icon,
   IconBook,
-  IconBrackets,
   IconBrandGithub,
   IconBrowser,
   IconCalendar,
@@ -11,8 +10,10 @@ import {
   IconScoreboard,
   IconSettings,
   IconTrophy,
+  IconTrophyOff,
   IconUser,
   IconUsers,
+  IconArrowsJoin
 } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
@@ -114,7 +115,7 @@ export function TournamentLinks({ tournament_id }: any) {
 
   const data = [
     {
-      icon: IconTrophy,
+      icon: IconArrowsJoin,
       label: capitalize(t('stage_title')),
       link: `${tm_prefix}/stages`,
     },
@@ -134,7 +135,11 @@ export function TournamentLinks({ tournament_id }: any) {
       link: `${tm_prefix}/schedule`,
     },
     {
-      icon: IconBrackets,
+      icon: IconTrophy,
+      label: capitalize(t('results_title')),
+      link: `${tm_prefix}/results_compact`,
+    },    {
+      icon: IconTrophyOff,
       label: capitalize(t('results_title')),
       link: `${tm_prefix}/results`,
     },

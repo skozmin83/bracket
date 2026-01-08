@@ -188,3 +188,6 @@ sort_by_size = true
 
 [tool.pyrefly]
 ignore-missing-imports = ["fastapi_sso.*"]
+
+[tool.poetry.dependencies]
+python = ">=3.12,<4.0"

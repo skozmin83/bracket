@@ -1,14 +1,13 @@
-import {Card, Center, Group, Stack, Table, Text, Tooltip,} from '@mantine/core';
+import TournamentLayout from "@pages/tournaments/_tournament_layout";
+import {MatchWithDetails} from "@openapi";
+import {Card, Center, Group, Stack, Table, Text, Title, Tooltip,} from '@mantine/core';
 import React, {useMemo, useState} from 'react';
-import {IconArrowDown, IconArrowsSort, IconArrowUp,} from '@tabler/icons-react';
 import {useTranslation} from 'react-i18next';
+import {IconArrowDown, IconArrowsSort, IconArrowUp,} from '@tabler/icons-react';
 
 import MatchModal from '@components/modals/match_modal';
-import {DashboardFooter} from '@components/dashboard/footer';
-import {DoubleHeader, getTournamentHeadTitle} from '@components/dashboard/layout';
-import {responseIsValid, setTitle} from '@components/utils/util';
-import {getStagesLive} from '@services/adapter';
-import {getTournamentResponseByEndpointName} from '@services/dashboard';
+import {getTournamentIdFromRouter, responseIsValid} from '@components/utils/util';
+import {getStages} from '@services/adapter';
 import {getMatchLookup, getStageItemLookup,} from '@services/lookups';
 
 /* ------------------------------------------------------------------ */
@@ -108,6 +107,7 @@ function computePlaces(players: any[], matches: any[]): Record<number, PlaceInfo
 
 /* ------------------------------------------------------------------ */
 /*  Matrix                                                             */
+
 /* ------------------------------------------------------------------ */
 
 function buildMatchMatrix(stageItem: any, matchesLookup: any) {
@@ -311,76 +311,60 @@ function RoundRobinTable({
   );
 }
 
-/* ------------------------------------------------------------------ */
-/*  Page                                                               */
-/* ------------------------------------------------------------------ */
+export default function ResultsPageCompact() {
+  const [modalOpened, modalSetOpened] = useState(false);
+  const [match, setMatch] = useState<MatchWithDetails | null>(null);
 
-export default function DashboardCompactSchedulePage() {
   const {t} = useTranslation();
-  const tournament = getTournamentResponseByEndpointName();
+  const {tournamentData} = getTournamentIdFromRouter();
+  const swrStagesResponse = getStages(tournamentData.id);
+  if (!responseIsValid(swrStagesResponse)) return null;
 
-  const [modalOpened, setModalOpened] = useState(false);
-  const [match, setMatch] = useState<any>(null);
+  const stageItems = getStageItemLookup(swrStagesResponse);
+  const matches = getMatchLookup(swrStagesResponse);
 
-  function openMatchModal(matchToOpen: any) {
+  function openMatchModal(matchToOpen: MatchWithDetails) {
     setMatch(matchToOpen);
-    setModalOpened(true);
+    modalSetOpened(true);
   }
 
   function modalSetOpenedAndUpdateMatch(opened: boolean) {
-    if (!opened) setMatch(null);
-    setModalOpened(opened);
+    if (!opened) {
+      setMatch(null);
+    }
+    modalSetOpened(opened);
   }
 
-  const tournamentId =
-    React.isValidElement(tournament) ? undefined : tournament.id;
-
-  const swrStages = getStagesLive(tournamentId);
-
-  if (React.isValidElement(tournament)) return tournament;
-  if (!responseIsValid(swrStages)) return null;
-
-  setTitle(getTournamentHeadTitle(tournament));
-
-  const stageItems = getStageItemLookup(swrStages);
-  const matches = getMatchLookup(swrStages);
-
   return (
-    <>
+    <TournamentLayout tournament_id={tournamentData.id}>
       <MatchModal
-        swrStagesResponse={swrStages}
+        swrStagesResponse={swrStagesResponse}
         swrUpcomingMatchesResponse={null}
-        tournamentData={tournament}
+        tournamentData={tournamentData}
         match={match}
         opened={modalOpened}
         setOpened={modalSetOpenedAndUpdateMatch}
         round={null}
       />
-
-      <DoubleHeader tournamentData={tournament}/>
-
+      <Title>{t('results_title')}</Title>
       <Center>
-        <Group style={{maxWidth: '64rem', width: '100%'}}>
-          <Stack w="100%">
-            {Object.values(stageItems).map((stageItem: any) => (
-              <Card key={stageItem.id} withBorder>
-                <Text fw={800} mb="sm">
-                  {stageItem.name}
-                </Text>
+        <Stack w="100%" maw="64rem" gap="md">
+          {Object.values(stageItems).map((stageItem: any) => (
+            <Card key={stageItem.id} withBorder w="100%">
+              <Text fw={800} mb="sm">
+                {stageItem.name}
+              </Text>
 
-                <RoundRobinTable
-                  stageItem={stageItem}
-                  matchesLookup={matches}
-                  editable={false}
-                  openMatchModal={openMatchModal}
-                />
-              </Card>
-            ))}
-          </Stack>
-        </Group>
+              <RoundRobinTable
+                stageItem={stageItem}
+                matchesLookup={matches}
+                editable={true}
+                openMatchModal={openMatchModal}
+              />
+            </Card>
+          ))}
+        </Stack>
       </Center>
-
-      <DashboardFooter/>
-    </>
+    </TournamentLayout>
   );
 }
