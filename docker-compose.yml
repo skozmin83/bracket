@@ -27,13 +27,15 @@ services:
       - bracket_static_data:/app/static
 
   postgres:
+    restart: always
     environment:
       POSTGRES_DB: bracket_dev
       POSTGRES_PASSWORD: bracket_dev
       POSTGRES_USER: bracket_dev
-    image: postgres
+    image: postgres:17
     networks:
       - bracket_lan
-    restart: always
+    ports:
+      - "5432:5432"
     volumes:
       - bracket_pg_data:/var/lib/postgresql/data

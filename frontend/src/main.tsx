@@ -20,7 +20,8 @@ import CreateAccountPage from './pages/create_account';
 import CreateDemoAccountPage from './pages/demo';
 import LoginPage from './pages/login';
 import PasswordResetPage from './pages/password_reset';
-import DashboardSchedulePage from './pages/tournaments/[id]/dashboard';
+import DashboardCompactSchedulePage from './pages/tournaments/[id]/dashboard';
+import DashboardSchedulePage from './pages/tournaments/[id]/dashboard/matches';
 import DashboardNotFoundPage from './pages/tournaments/[id]/dashboard/dashboard_404';
 import CourtsPresentPage from './pages/tournaments/[id]/dashboard/present/courts';
 import StandingsPresentPage from './pages/tournaments/[id]/dashboard/present/standings';
@@ -95,7 +96,8 @@ createRoot(document.getElementById('root')!).render(
                     <Route path="swiss/:stage_item_id" element={<SwissTournamentPage />} />
                   </Route>
                   <Route path="dashboard">
-                    <Route index element={<DashboardSchedulePage />} />
+                    <Route index element={<DashboardCompactSchedulePage />} />
+                    <Route path="matches" element={<DashboardSchedulePage />} />
                     <Route path="standings" element={<DashboardStandingsPage />} />
                     <Route path="present">
                       <Route path="courts" element={<CourtsPresentPage />} />

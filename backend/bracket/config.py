@@ -38,17 +38,29 @@ class Config(BaseSettings):
     cors_origins: str = "*"
     jwt_secret: str
     auto_run_migrations: bool = True
-    pg_dsn: PostgresDsn = PostgresDsn("postgresql://user:pass@localhost:5432/db")
     sentry_dsn: str | None = None
     serve_frontend: bool = False
     api_prefix: str = ""
 
+    # Postgres fields
+    postgres_user:str = "bracket_dev"
+    postgres_password:str = "bracket_dev"
+    postgres_db:str = "bracket_dev"
+    postgres_host:str = "localhost"
+    postgres_port: int = 5432
+
+    @property
+    def pg_dsn(self) -> str:
+        """Generate Postgres DSN from fields"""
+        return f"postgresql://{self.postgres_user}:{self.postgres_password}@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
+
     def is_cors_enabled(self) -> bool:
         return self.cors_origins != "*"
 
+    model_config = SettingsConfigDict(extra="ignore")
 
 class CIConfig(Config):
-    model_config = SettingsConfigDict(env_file="ci.env")
+    model_config = SettingsConfigDict(env_file="ci.env", extra="ignore")
 
 
 class DevelopmentConfig(Config):
@@ -59,15 +71,14 @@ class DevelopmentConfig(Config):
         str, Field("7495204c062787f257b12d03b88d80da1d338796a6449666eb634c9efbbf5fa7")
     ]
 
-    model_config = SettingsConfigDict(env_file="dev.env")
-
+    model_config = SettingsConfigDict(env_file="dev.env", extra="ignore")
 
 class ProductionConfig(Config):
-    model_config = SettingsConfigDict(env_file="prod.env")
+    model_config = SettingsConfigDict(env_file="prod.env", extra="ignore")
 
 
 class DemoConfig(Config):
-    model_config = SettingsConfigDict(env_file="demo.env")
+    model_config = SettingsConfigDict(env_file="demo.env", extra="ignore")
 
 
 def currently_testing() -> bool:
