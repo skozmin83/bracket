@@ -9,6 +9,8 @@ import MatchModal from '@components/modals/match_modal';
 import {getTournamentIdFromRouter, responseIsValid} from '@components/utils/util';
 import {getStages} from '@services/adapter';
 import {getMatchLookup, getStageItemLookup,} from '@services/lookups';
+import {NoContent} from "@components/no_content/empty_table_info";
+import { AiOutlineHourglass } from '@react-icons/all-files/ai/AiOutlineHourglass';
 
 /* ------------------------------------------------------------------ */
 /*  Colors                                                             */
@@ -311,7 +313,7 @@ function RoundRobinTable({
   );
 }
 
-export default function ResultsPageCompact() {
+export default function ResultsCompactPage() {
   const [modalOpened, modalSetOpened] = useState(false);
   const [match, setMatch] = useState<MatchWithDetails | null>(null);
 
@@ -335,6 +337,7 @@ export default function ResultsPageCompact() {
     modalSetOpened(opened);
   }
 
+  // debugger;
   return (
     <TournamentLayout tournament_id={tournamentData.id}>
       <MatchModal
@@ -346,7 +349,14 @@ export default function ResultsPageCompact() {
         setOpened={modalSetOpenedAndUpdateMatch}
         round={null}
       />
-      <Title>{t('results_title')}</Title>
+      {/*<Title>{t('results_title')}</Title>*/}
+      {(Object.keys(stageItems).length < 1) ?
+        <NoContent
+          title={t('no_matches_title')}
+          description={t('no_matches_description')}
+          icon={<AiOutlineHourglass/>}
+        /> : ''
+      }
       <Center>
         <Stack w="100%" maw="64rem" gap="md">
           {Object.values(stageItems).map((stageItem: any) => (

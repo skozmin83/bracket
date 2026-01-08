@@ -152,7 +152,7 @@ export default function Layout({ children, additionalNavbarLinks, breadcrumbs }:
         breadcrumbs={breadcrumbs}
       />
       <NavBar links={linksComponent} />
-      <AppShell.Main>{children}</AppShell.Main>
+      <AppShell.Main width={'100%'}>{children}</AppShell.Main>
     </AppShell>
   );
 }

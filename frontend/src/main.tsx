@@ -28,8 +28,7 @@ import StandingsPresentPage from './pages/tournaments/[id]/dashboard/present/sta
 import DashboardStandingsPage from './pages/tournaments/[id]/dashboard/standings';
 import PlayersPage from './pages/tournaments/[id]/players';
 import RankingsPage from './pages/tournaments/[id]/rankings';
-import ResultsPage from './pages/tournaments/[id]/results';
-import ResultsPageCompact from './pages/tournaments/[id]/results_compact';
+import ResultsCompactPage from './pages/tournaments/[id]/results_compact';
 import SchedulePage from './pages/tournaments/[id]/schedule';
 import SettingsPage from './pages/tournaments/[id]/settings';
 import StagesPage from './pages/tournaments/[id]/stages';
@@ -91,8 +90,7 @@ createRoot(document.getElementById('root')!).render(
                   <Route path="schedule" element={<SchedulePage />} />
                   <Route path="rankings" element={<RankingsPage />} />
                   <Route path="settings" element={<SettingsPage />} />
-                  <Route path="results" element={<ResultsPage />} />
-                  <Route path="results_compact" element={<ResultsPageCompact />} />
+                  <Route path="results" element={<ResultsCompactPage />} />
                   <Route path="stages">
                     <Route index element={<StagesPage />} />
                     <Route path="swiss/:stage_item_id" element={<SwissTournamentPage />} />

@@ -137,10 +137,6 @@ export function TournamentLinks({ tournament_id }: any) {
     {
       icon: IconTrophy,
       label: capitalize(t('results_title')),
-      link: `${tm_prefix}/results_compact`,
-    },    {
-      icon: IconTrophyOff,
-      label: capitalize(t('results_title')),
       link: `${tm_prefix}/results`,
     },
     {
