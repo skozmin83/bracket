@@ -49,8 +49,12 @@ class Config(BaseSettings):
     postgres_host:str = "localhost"
     postgres_port: int = 5432
 
+    pg_dsn_override: str | None = None
+
     @property
     def pg_dsn(self) -> str:
+        if self.pg_dsn_override:
+            return self.pg_dsn_override
         """Generate Postgres DSN from fields"""
         return f"postgresql://{self.postgres_user}:{self.postgres_password}@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
 

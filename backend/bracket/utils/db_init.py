@@ -116,10 +116,12 @@ async def init_db_when_empty() -> UserId | None:
     table_count = await database.fetch_val(
         "SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public'"
     )
+    logger.info(f"Checking DB to init, table count: {table_count}")
+    logger.info(f"Admin email: {config.admin_email}, pwd is None: {config.admin_password is None}")
     if config.admin_email and config.admin_password:
         if (table_count <= 1 and environment != Environment.CI) or (
             environment is Environment.DEVELOPMENT and await get_user(config.admin_email) is None
-        ):
+        ) or (environment is Environment.PRODUCTION and await get_user(config.admin_email) is None) :
             logger.warning("Empty db detected, creating tables...")
             metadata.create_all(engine)
             alembic_stamp_head()

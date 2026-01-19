@@ -5,6 +5,7 @@ from databases import Database
 from heliclockter import datetime_utc
 
 from bracket.config import config
+from bracket.utils.logging import logger
 
 
 def datetime_decoder(value: str) -> datetime_utc:
@@ -21,7 +22,7 @@ async def asyncpg_init(connection: Any) -> None:
             schema="pg_catalog",
         )
 
-
+logger.info("Using DB: %s", config.pg_dsn.split("@")[-1])
 database = Database(str(config.pg_dsn), init=asyncpg_init)
 
 engine = sqlalchemy.create_engine(str(config.pg_dsn))
