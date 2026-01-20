@@ -31,6 +31,7 @@ export default function DashboardCompactSchedulePage() {
   }
 
   const tournamentId = React.isValidElement(tournament) ? undefined : tournament.id;
+  console.log('tournamentId', tournamentId);
   const swrStages = getStagesLive(tournamentId);
 
   if (React.isValidElement(tournament)) return tournament;

@@ -34,6 +34,7 @@ export default function UserForm({ user, t, i18n }: { user: UserPublic; t: any; 
   });
 
   const locales = [
+    { value: 'ru', label: 'ru Русский' },
     { value: 'de', label: '🇩🇪 German' },
     { value: 'el', label: '🇬🇷 Greek' },
     { value: 'en', label: '🇺🇸 English' },

@@ -5,11 +5,11 @@ import { getTournamentEndpointFromRouter } from '@components/utils/util';
 import { Tournament } from '@openapi';
 import DashboardNotFoundTitle from '@pages/tournaments/[id]/dashboard/dashboard_404';
 import GenericErrorPage from '@pages/tournaments/[id]/dashboard/generic_dashboard_error';
-import { getTournamentByEndpointName } from './adapter';
+import {getTournamentById} from './adapter';
 
 export function getTournamentResponseByEndpointName(): Tournament | React.ReactElement {
   const endpointName = getTournamentEndpointFromRouter();
-  const swrTournamentsResponse = getTournamentByEndpointName(endpointName);
+  const swrTournamentsResponse = getTournamentById(endpointName);
 
   if (swrTournamentsResponse.isLoading) return <TableSkeletonTwoColumns />;
   if (swrTournamentsResponse.error) {
@@ -18,5 +18,5 @@ export function getTournamentResponseByEndpointName(): Tournament | React.ReactE
   }
 
   const data = swrTournamentsResponse.data?.data;
-  return (data == null ? null : data[0]) || <DashboardNotFoundTitle />;
+  return data || <DashboardNotFoundTitle />;
 }
