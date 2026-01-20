@@ -9,7 +9,7 @@ import {NuqsAdapter} from 'nuqs/adapters/react-router/v7';
 import {StrictMode} from 'react';
 import {createRoot} from 'react-dom/client';
 import {I18nextProvider} from 'react-i18next';
-import {BrowserRouter, Route, Routes} from 'react-router';
+import {BrowserRouter, Route, Routes, Navigate} from 'react-router';
 
 import i18n from '../i18n';
 import {BracketSpotlight} from './components/modals/spotlight';
@@ -20,12 +20,12 @@ import CreateAccountPage from './pages/create_account';
 import CreateDemoAccountPage from './pages/demo';
 import LoginPage from './pages/login';
 import PasswordResetPage from './pages/password_reset';
-import DashboardCompactSchedulePage from './pages/tournaments/[id]/dashboard';
-import DashboardSchedulePage from './pages/tournaments/[id]/dashboard/matches';
-import DashboardNotFoundPage from './pages/tournaments/[id]/dashboard/dashboard_404';
-import CourtsPresentPage from './pages/tournaments/[id]/dashboard/present/courts';
-import StandingsPresentPage from './pages/tournaments/[id]/dashboard/present/standings';
-import DashboardStandingsPage from './pages/tournaments/[id]/dashboard/standings';
+import DashboardCompactSchedulePage from '@pages/spectator/turnaments/[id]/dashboard';
+import DashboardSchedulePage from '@pages/spectator/turnaments/[id]/dashboard/matches';
+import DashboardNotFoundPage from '@pages/spectator/turnaments/[id]/dashboard/dashboard_404';
+import CourtsPresentPage from '@pages/spectator/turnaments/[id]/dashboard/present/courts';
+import StandingsPresentPage from '@pages/spectator/turnaments/[id]/dashboard/present/standings';
+import DashboardStandingsPage from '@pages/spectator/turnaments/[id]/dashboard/standings';
 import PlayersPage from './pages/tournaments/[id]/players';
 import RankingsPage from './pages/tournaments/[id]/rankings';
 import ResultsCompactPage from './pages/tournaments/[id]/results_compact';
@@ -88,7 +88,8 @@ createRoot(document.getElementById('root')!).render(
                 <Route path="tournaments">
                   <Route path=":id">
                     <Route path="dashboard">
-                      <Route index element={<DashboardCompactSchedulePage/>}/>
+                      <Route index element={<Navigate to="results" replace />} />
+                      <Route path="results" element={<DashboardCompactSchedulePage/>}/>
                       <Route path="matches" element={<DashboardSchedulePage/>}/>
                       <Route path="standings" element={<DashboardStandingsPage/>}/>
                       <Route path="present">

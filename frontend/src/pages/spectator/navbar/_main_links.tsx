@@ -103,45 +103,15 @@ export function getBaseLinks() {
 export function TournamentLinks({ tournament_id }: any) {
   const location = useLocation();
   const { t } = useTranslation();
-  const tm_prefix = `/tournaments/${tournament_id}`;
+  const tm_prefix = `/spectator/tournaments/${tournament_id}/dashboard`;
   const pathName = location.pathname.replace('[id]', tournament_id).replace(/\/+$/, '');
 
   const data = [
     {
-      icon: IconArrowsJoin,
-      label: capitalize(t('stage_title')),
-      link: `${tm_prefix}/stages`,
-    },
-    {
-      icon: IconUser,
-      label: capitalize(t('players_title')),
-      link: `${tm_prefix}/players`,
-    },
-    {
-      icon: IconUsers,
-      label: capitalize(t('teams_title')),
-      link: `${tm_prefix}/teams`,
-    },
-    {
-      icon: IconCalendar,
-      label: capitalize(t('planning_title')),
-      link: `${tm_prefix}/schedule`,
-    },
-    {
       icon: IconTrophy,
       label: capitalize(t('results_title')),
-      link: `${tm_prefix}/results`,
-    },
-    {
-      icon: IconScoreboard,
-      label: capitalize(t('rankings_title')),
-      link: `${tm_prefix}/rankings`,
-    },
-    {
-      icon: IconSettings,
-      label: capitalize(t('tournament_setting_title')),
-      link: `${tm_prefix}/settings`,
-    },
+      link: `${tm_prefix}/`,
+    }
   ];
 
   const links = data.map((link) => <MainLink key={link.label} item={link} pathName={pathName} />);
