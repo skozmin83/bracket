@@ -75,15 +75,11 @@ async def get_tournament(
 
 @router.get("/tournaments", response_model=TournamentsResponse)
 async def get_tournaments(
-    user: UserPublic | None = Depends(user_authenticated_or_public_dashboard_by_endpoint_name),
     filter_: Literal["ALL", "OPEN", "ARCHIVED"] = "OPEN",
     endpoint_name: str | None = None,
 ) -> TournamentsResponse:
-    match user, endpoint_name:
-        case None, None:
-            raise unauthorized_exception
-
-        case _, str() as endpoint_name:
+    match endpoint_name:
+        case str() as endpoint_name:
             tournament = await sql_get_tournament_by_endpoint_name(endpoint_name)
             if tournament is None:
                 raise HTTPException(
@@ -93,14 +89,10 @@ async def get_tournaments(
                 )
             return TournamentsResponse(data=[tournament])
 
-        case _, _ if isinstance(user, UserPublic):
-            user_club_ids = await get_which_clubs_has_user_access_to(user.id)
+        case _:
             return TournamentsResponse(
-                data=await sql_get_tournaments(tuple(user_club_ids), endpoint_name, filter_)
+                data=await sql_get_tournaments(club_ids=None, endpoint_name=endpoint_name, filter_=filter_)
             )
-
-    raise RuntimeError()
-
 
 @router.put("/tournaments/{tournament_id}", response_model=SuccessResponse)
 async def update_tournament_by_id(

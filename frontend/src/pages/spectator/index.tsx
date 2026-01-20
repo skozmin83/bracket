@@ -6,7 +6,7 @@ import TournamentsReadonlyCardTable from './card_tables/tournaments-readonly';
 import { TournamentFilter } from '@components/utils/tournament';
 import { capitalize } from '@components/utils/util';
 import { checkForAuthError, getTournaments } from '@services/adapter';
-import Layout from './_layout';
+import Layout from './_layout_spectator';
 import classes from './index.module.css';
 
 export default function SpectatorHomePage() {
@@ -14,8 +14,6 @@ export default function SpectatorHomePage() {
   const [filter, setFilter] = useState<TournamentFilter>('OPEN');
 
   const swrTournamentsResponse = getTournaments(filter);
-  checkForAuthError(swrTournamentsResponse);
-
   return (
     <Layout>
       <Grid>

@@ -2,8 +2,8 @@ import {Group, ThemeIcon, Title, Tooltip} from '@mantine/core';
 import {useTranslation} from 'react-i18next';
 import {HiArchiveBoxArrowDown} from 'react-icons/hi2';
 
-import {TournamentLinks} from '@pages/spectator/navbar/_main_links';
-import Layout from '@pages/spectator/_layout';
+import {TournamentLinks} from '@pages/spectator/navbar/_main_links_spectator';
+import Layout from '@pages/spectator/_layout_spectator';
 import {Tournament} from "@openapi";
 
 export default function TournamentLayoutReadonly({tournament, children}: {

@@ -14,8 +14,8 @@ import { Icon, IconMoonStars, IconSun } from '@tabler/icons-react';
 import { ReactNode } from 'react';
 import { useLocation } from 'react-router';
 
-import { Brand } from '@components/navbar/_brand';
-import { getBaseLinks, getBaseLinksDict } from './navbar/_main_links';
+import { Brand } from './navbar/_brand_spectator';
+import { getBaseLinks, getBaseLinksDict } from './navbar/_main_links_spectator';
 import PreloadLink from '@components/utils/link';
 import classes from './_layout.module.css';
 

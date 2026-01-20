@@ -1,26 +1,11 @@
-import { Center, Divider, Group, Tooltip, UnstyledButton } from '@mantine/core';
-import {
-  Icon,
-  IconBook,
-  IconBrandGithub,
-  IconBrowser,
-  IconCalendar,
-  IconDots,
-  IconHome,
-  IconScoreboard,
-  IconSettings,
-  IconTrophy,
-  IconTrophyOff,
-  IconUser,
-  IconUsers,
-  IconArrowsJoin
-} from '@tabler/icons-react';
-import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router';
+import {Center, Divider, Group, Tooltip, UnstyledButton} from '@mantine/core';
+import {Icon, IconBook, IconBrandGithub, IconBrowser, IconDots, IconHome, IconTrophy} from '@tabler/icons-react';
+import {useTranslation} from 'react-i18next';
+import {useLocation} from 'react-router';
 
 import PreloadLink from '@components/utils/link';
-import { capitalize } from '@components/utils/util';
-import { getBaseApiUrl } from '@services/adapter';
+import {capitalize} from '@components/utils/util';
+import {getBaseApiUrl} from '@services/adapter';
 import classes from '@components/navbar/_main_links.module.css';
 
 interface MainLinkProps {
