@@ -49,9 +49,9 @@ export default function UserForm({ user, t, i18n }: { user: UserPublic; t: any; 
     { value: 'zh', label: '🇨🇳 Chinese' },
   ];
 
-  const changeLanguage = (newLocale: string | null) => {
-    i18n.changeLanguage(newLocale);
-    navigate(`/user?lng=${newLocale}`);
+  const changeLanguage = (lng: string | null) => {
+    if (!lng) return;
+    i18n.changeLanguage(lng);
   };
 
   return (
@@ -119,7 +119,7 @@ export default function UserForm({ user, t, i18n }: { user: UserPublic; t: any; 
           value={i18n.language}
           label={t('language')}
           data={locales}
-          onChange={async (lng) => changeLanguage(lng)}
+          onChange={changeLanguage}
         />
       </Tabs.Panel>
     </Tabs>

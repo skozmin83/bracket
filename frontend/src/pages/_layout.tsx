@@ -9,10 +9,12 @@ import {
   useComputedColorScheme,
   useMantineColorScheme,
 } from '@mantine/core';
+import {BiGlobe} from '@react-icons/all-files/bi/BiGlobe';
+import {Icon, IconMoonStars, IconSun} from '@tabler/icons-react';
+import {useLocation} from 'react-router';
 import { useDisclosure } from '@mantine/hooks';
-import { Icon, IconMoonStars, IconSun } from '@tabler/icons-react';
 import { ReactNode } from 'react';
-import { useLocation } from 'react-router';
+import {useTranslation} from 'react-i18next';
 
 import { Brand } from '@components/navbar/_brand';
 import { getBaseLinks, getBaseLinksDict } from '@components/navbar/_main_links';
@@ -65,6 +67,24 @@ export function HeaderAction({ links, navbarState, breadcrumbs }: HeaderActionPr
   const { setColorScheme } = useMantineColorScheme();
   const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
 
+  const { i18n } = useTranslation();
+
+  const locales = [
+    { value: 'ru', label: 'ru Русский' },
+    { value: 'de', label: '🇩🇪 German' },
+    { value: 'el', label: '🇬🇷 Greek' },
+    { value: 'en', label: '🇺🇸 English' },
+    { value: 'es', label: '🇪🇸 Spanish' },
+    { value: 'fa', label: '🌐 Persian' },
+    { value: 'fr', label: '🇫🇷 French' },
+    { value: 'it', label: '🇮🇹 Italian' },
+    { value: 'ja', label: '🇯🇵 Japanese' },
+    { value: 'nl', label: '🇳🇱 Dutch' },
+    { value: 'pt', label: '🇵🇹 Portuguese' },
+    { value: 'sv', label: '🇸🇪 Swedish' },
+    { value: 'zh', label: '🇨🇳 Chinese' },
+  ];
+
   const items = links.map((link) => {
     if (link.links) {
       return getMenuItemsForLink(link, classes, pathName);
@@ -93,6 +113,24 @@ export function HeaderAction({ links, navbarState, breadcrumbs }: HeaderActionPr
         </Center>
         <Group gap={5} visibleFrom="sm">
           {items}
+
+          {/* Language menu */}
+          <Menu withinPortal position="bottom-end">
+            <Menu.Target>
+              <ActionIcon variant="default" size={30} ml="0.5rem">
+                <BiGlobe size={16} />
+              </ActionIcon>
+            </Menu.Target>
+            <Menu.Dropdown>
+              {locales.map((lng) => (
+                <Menu.Item key={lng.value} onClick={() => i18n.changeLanguage(lng.value)}>
+                  {lng.label}
+                </Menu.Item>
+              ))}
+            </Menu.Dropdown>
+          </Menu>
+
+          {/* Light/Dark toggle */}
           <ActionIcon
             variant="default"
             onClick={() => setColorScheme(computedColorScheme === 'light' ? 'dark' : 'light')}
