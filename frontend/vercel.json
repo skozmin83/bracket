@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "https://zceywkprjbzn.us-west-1.clawcloudrun.com/api/$1" },
+    { "source": "/(.*)", "destination": "/" }
+  ]
+}
