@@ -59,6 +59,14 @@ cd frontend
 pnpm run dev
 ```
 
+```bash
+ENVIRONMENT=DEVELOPMENT \
+uvicorn bracket.app:app \
+  --reload \
+  --host 0.0.0.0 \
+  --port 8400
+```
+
 ### Backend
 
 ```bash
