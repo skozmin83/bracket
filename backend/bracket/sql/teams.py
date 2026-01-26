@@ -8,23 +8,29 @@ from bracket.utils.pagination import PaginationTeams
 from bracket.utils.types import dict_without_none
 
 
-async def get_teams_by_id(team_ids: set[TeamId], tournament_id: TournamentId) -> list[Team]:
+async def get_teams_by_id(team_ids: set[TeamId], tournament_id: TournamentId | None = None) -> list[Team]:
     if len(team_ids) < 1:
         return []
-
-    query = """
+    tournament_id_filter = "AND tournament_id = :tournament_id" if tournament_id else ""
+    query = f"""
         SELECT *
         FROM teams
-        WHERE id = any(:team_ids)
-        AND tournament_id = :tournament_id
+        WHERE id = any(:team_ids) 
+        {tournament_id_filter}
     """
+    values = dict_without_none(
+        {
+            "team_ids": team_ids,
+            "tournament_id": tournament_id if tournament_id is not None else None,
+        }
+    )
     result = await database.fetch_all(
-        query=query, values={"team_ids": team_ids, "tournament_id": tournament_id}
+        query=query, values=values
     )
     return [Team.model_validate(team) for team in result]
 
 
-async def get_team_by_id(team_id: TeamId, tournament_id: TournamentId) -> Team | None:
+async def get_team_by_id(team_id: TeamId, tournament_id: TournamentId | None = None) -> Team | None:
     result = await get_teams_by_id({team_id}, tournament_id)
     return result[0] if len(result) > 0 else None
 
@@ -128,3 +134,25 @@ async def sql_delete_team(tournament_id: TournamentId, team_id: TeamId) -> None:
 async def sql_delete_teams_of_tournament(tournament_id: TournamentId) -> None:
     query = "DELETE FROM teams WHERE tournament_id = :tournament_id"
     await database.fetch_one(query=query, values={"tournament_id": tournament_id})
+
+async def search_historical_teams_by_name(
+    query: str,
+    limit: int = 20,
+) -> list[FullTeamWithPlayers]:
+    sql = """
+        SELECT DISTINCT ON (LOWER(teams.name))
+            teams.*,
+            to_json(array_agg(p.*)) AS players
+        FROM teams
+        LEFT JOIN players_x_teams pt ON pt.team_id = teams.id
+        LEFT JOIN players p ON pt.player_id = p.id
+        WHERE LOWER(teams.name) LIKE LOWER(:query)
+        GROUP BY teams.id
+        ORDER BY LOWER(teams.name), teams.created DESC
+        LIMIT :limit
+    """
+    rows = await database.fetch_all(
+        sql,
+        {"query": f"%{query}%", "limit": limit},
+    )
+    return [FullTeamWithPlayers.model_validate(r) for r in rows]

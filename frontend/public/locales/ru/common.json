@@ -272,5 +272,8 @@
   "win_distribution_text_draws": "ничьи",
   "win_distribution_text_losses": "поражения",
   "win_distribution_text_win": "победы",
-  "win_points_input_label": "Очки за победу"
+  "win_points_input_label": "Очки за победу",
+  "historical_team_search": "Поиск комманды в истории игр",
+  "start_typing_search": "Начни писать имя комманды...",
+  "historical_team_tab": "Выбери из истории"
 }

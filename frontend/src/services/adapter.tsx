@@ -169,6 +169,19 @@ export function getTeamsPaginated(
   );
 }
 
+export function searchHistoricalTeams(query: string): SWRResponse<TeamsWithPlayersResponse> {
+  return useSWR(`/teams/historical/search?q=${encodeURIComponent(query)}`, fetcher);
+}
+
+export function createTeamFromHistorical(
+  tournamentId: number,
+  teamId: number
+): SWRResponse<TeamsWithPlayersResponse> {
+  return useSWR(
+    `/tournaments/${tournamentId}/teams/from_historical/${teamId}`
+  , fetcher);
+}
+
 export function getTeamsLive(tournament_id: number | null): SWRResponse<TeamsWithPlayersResponse> {
   return useSWR(tournament_id == null ? null : `tournaments/${tournament_id}/teams`, fetcher, {
     refreshInterval: 5_000,

@@ -43,6 +43,7 @@ from bracket.sql.teams import (
     get_team_count,
     get_teams_with_members,
     sql_delete_team,
+    search_historical_teams_by_name
 )
 from bracket.sql.validation import check_foreign_keys_belong_to_tournament
 from bracket.utils.db import fetch_one_parsed
@@ -243,3 +244,39 @@ async def create_multiple_teams(
                 await insert_player(player_body, tournament_id)
 
     return SuccessResponse()
+
+@router.get(
+    "/teams/historical/search",
+    response_model=TeamsWithPlayersResponse,
+)
+async def search_historical_teams(
+    q: str,
+) -> TeamsWithPlayersResponse:
+    teams = await search_historical_teams_by_name(q)
+    return TeamsWithPlayersResponse(data={"teams": teams, "count": len(teams)})
+
+@router.post(
+    "/tournaments/{tournament_id}/teams/from_historical/{team_id}",
+    response_model=SingleTeamResponse,
+)
+async def create_team_from_historical(
+    tournament_id: TournamentId,
+    team_id: TeamId,
+    _: UserPublic = Depends(user_authenticated_for_tournament),
+    __: Tournament = Depends(disallow_archived_tournament),
+) -> SingleTeamResponse:
+    historical_team = await get_team_by_id(team_id, tournament_id=None)  # global lookup
+    assert historical_team is not None
+
+    new_team_id = await database.execute(
+        teams.insert().values(
+            name=historical_team.name,
+            active=historical_team.active,
+            created=datetime_utc.now(),
+            tournament_id=tournament_id,
+        )
+    )
+
+    return SingleTeamResponse(
+        data=assert_some(await get_team_by_id(new_team_id, tournament_id))
+    )
