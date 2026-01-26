@@ -1,4 +1,4 @@
-import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
+import {DragDropContext, Draggable, Droppable} from '@hello-pangea/dnd';
 import {
   ActionIcon,
   Alert,
@@ -12,24 +12,24 @@ import {
   Text,
   Title,
 } from '@mantine/core';
-import { AiFillWarning } from '@react-icons/all-files/ai/AiFillWarning';
-import { IconAlertCircle, IconCalendarPlus, IconDots, IconTrash } from '@tabler/icons-react';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { SWRResponse } from 'swr';
-
+import {AiFillWarning} from '@react-icons/all-files/ai/AiFillWarning';
+import {IconAlertCircle, IconCalendarPlus, IconDots, IconTrash} from '@tabler/icons-react';
+import {useState} from 'react';
+import {useTranslation} from 'react-i18next';
+import {SWRResponse} from 'swr';
+import {BsCircleFill} from 'react-icons/bs'; // Bootstrap filled circle
 import CourtModal from '@components/modals/create_court_modal';
 import MatchModal from '@components/modals/match_modal';
-import { NoContent } from '@components/no_content/empty_table_info';
-import { Time } from '@components/utils/datetime';
-import { formatMatchInput1, formatMatchInput2 } from '@components/utils/match';
-import { TournamentMinimal } from '@components/utils/tournament';
-import { Translator } from '@components/utils/types';
-import { getTournamentIdFromRouter, responseIsValid } from '@components/utils/util';
-import { Court, CourtsResponse, MatchWithDetails } from '@openapi';
+import {NoContent} from '@components/no_content/empty_table_info';
+import {Time} from '@components/utils/datetime';
+import {formatMatchInput1, formatMatchInput2} from '@components/utils/match';
+import {TournamentMinimal} from '@components/utils/tournament';
+import {Translator} from '@components/utils/types';
+import {getTournamentIdFromRouter, responseIsValid} from '@components/utils/util';
+import {Court, CourtsResponse, MatchWithDetails} from '@openapi';
 import TournamentLayout from '@pages/tournaments/_tournament_layout';
-import { getCourts, getStages } from '@services/adapter';
-import { deleteCourt } from '@services/court';
+import {getCourts, getStages} from '@services/adapter';
+import {deleteCourt} from '@services/court';
 import {
   getMatchLookup,
   getMatchLookupByCourt,
@@ -37,7 +37,9 @@ import {
   getStageItemLookup,
   stringToColour,
 } from '@services/lookups';
-import { rescheduleMatch, scheduleMatches } from '@services/match';
+import {rescheduleMatch, scheduleMatches} from '@services/match';
+
+import { IconCheck } from '@tabler/icons-react'; // add at top
 
 function ScheduleRow({
   index,
@@ -53,6 +55,17 @@ function ScheduleRow({
   matchesLookup: any;
 }) {
   const { t } = useTranslation();
+
+  const played =
+    match.stage_item_input1_score != null &&
+    match.stage_item_input2_score != null &&
+    (match.stage_item_input1_score > 0 || match.stage_item_input2_score > 0);
+
+  const score1 = match.stage_item_input1_score ?? '';
+  const score2 = match.stage_item_input2_score ?? '';
+
+  const rowHeight = 28; // fixed height in px
+
   return (
     <Draggable key={match.id} index={index} draggableId={`${match.id}`}>
       {(provided) => (
@@ -63,40 +76,51 @@ function ScheduleRow({
             radius="md"
             withBorder
             mt="md"
-            onClick={() => {
-              openMatchModal(match);
-            }}
+            onClick={() => openMatchModal(match)}
             {...provided.dragHandleProps}
           >
-            <Grid>
-              <Grid.Col span="auto">
-                <Group gap="xs">
-                  {match.stage_item_input1_conflict && <AiFillWarning color="red" />}
-                  <Text fw={500}>
-                    {formatMatchInput1(t, stageItemsLookup, matchesLookup, match)}
-                  </Text>
-                </Group>
-                <Group gap="xs">
-                  {match.stage_item_input2_conflict && <AiFillWarning color="red" />}
-                  <Text fw={500}>
-                    {formatMatchInput2(t, stageItemsLookup, matchesLookup, match)}
-                  </Text>
-                </Group>
-              </Grid.Col>
-              <Grid.Col span="content">
-                <Stack gap="xs" align="end">
-                  <Badge variant="default" size="lg">
-                    {match.start_time != null ? <Time datetime={match.start_time} /> : null}
-                  </Badge>
+            <div style={{ display: 'table', width: '100%' }}>
+              {/* First Player */}
+              <div style={{ display: 'table-row', height: rowHeight }}>
+                <div style={{ display: 'table-cell', textAlign: 'left', verticalAlign: 'middle' }}>
+                  <Group gap="xs">
+                    {match.stage_item_input1_conflict && <AiFillWarning color="red" />}
+                    <Text fw={500}>{formatMatchInput1(t, stageItemsLookup, matchesLookup, match)}</Text>
+                  </Group>
+                </div>
+                <div style={{ display: 'table-cell', textAlign: 'right', verticalAlign: 'middle' }}>
+                  <Text fw={500}>{score1}</Text>
+                </div>
+              </div>
+
+              {/* Second Player */}
+              <div style={{ display: 'table-row', height: rowHeight }}>
+                <div style={{ display: 'table-cell', textAlign: 'left', verticalAlign: 'middle' }}>
+                  <Group gap="xs">
+                    {match.stage_item_input2_conflict && <AiFillWarning color="red" />}
+                    <Text fw={500}>{formatMatchInput2(t, stageItemsLookup, matchesLookup, match)}</Text>
+                  </Group>
+                </div>
+                <div style={{ display: 'table-cell', textAlign: 'right', verticalAlign: 'middle' }}>
+                  <Text fw={500}>{score2}</Text>
+                </div>
+              </div>
+
+              {/* Game Type + Played Marker */}
+              <div style={{ display: 'table-row', height: rowHeight }}>
+                <div style={{ display: 'table-cell', textAlign: 'left', verticalAlign: 'middle' }}>
                   <Badge
                     color={stringToColour(`${matchesLookup[match.id].stageItem.id}`)}
                     variant="outline"
                   >
-                    {matchesLookup[match.id].stageItem.name}
+                    {matchesLookup[match.id].stageItem.type_name}
                   </Badge>
-                </Stack>
-              </Grid.Col>
-            </Grid>
+                </div>
+                <div style={{ display: 'table-cell', textAlign: 'right', verticalAlign: 'middle' }}>
+                  {played && <IconCheck size={24} color="green" />}
+                </div>
+              </div>
+            </div>
           </Card>
         </div>
       )}
@@ -104,15 +128,16 @@ function ScheduleRow({
   );
 }
 
+
 function ScheduleColumn({
-  tournamentId,
-  court,
-  matches,
-  openMatchModal,
-  stageItemsLookup,
-  swrCourtsResponse,
-  matchesLookup,
-}: {
+                          tournamentId,
+                          court,
+                          matches,
+                          openMatchModal,
+                          stageItemsLookup,
+                          swrCourtsResponse,
+                          matchesLookup,
+                        }: {
   tournamentId: number;
   court: Court;
   matches: MatchWithDetails[];
@@ -121,7 +146,7 @@ function ScheduleColumn({
   swrCourtsResponse: SWRResponse<CourtsResponse>;
   matchesLookup: any;
 }) {
-  const { t } = useTranslation();
+  const {t} = useTranslation();
   const rows = matches.map((match: MatchWithDetails, index: number) => (
     <ScheduleRow
       index={index}
@@ -136,7 +161,7 @@ function ScheduleColumn({
   const noItemsAlert =
     matches.length < 1 ? (
       <Alert
-        icon={<IconAlertCircle size={16} />}
+        icon={<IconAlertCircle size={16}/>}
         title={t('no_matches_title')}
         color="gray"
         radius="md"
@@ -150,21 +175,21 @@ function ScheduleColumn({
     <Droppable droppableId={`${court.id}`} direction="vertical">
       {(provided) => (
         <div {...provided.droppableProps} ref={provided.innerRef}>
-          <div style={{ width: '25rem' }}>
+          <div style={{width: '25rem'}}>
             <Group justify="space-between">
               <Group>
-                <h4 style={{ marginTop: '0', margin: 'auto' }}>{court.name}</h4>
+                <h4 style={{marginTop: '0', margin: 'auto'}}>{court.name}</h4>
               </Group>
               <Menu withinPortal position="bottom-end" shadow="sm">
                 <Menu.Target>
                   <ActionIcon variant="transparent" color="gray">
-                    <IconDots size="1.25rem" />
+                    <IconDots size="1.25rem"/>
                   </ActionIcon>
                 </Menu.Target>
 
                 <Menu.Dropdown>
                   <Menu.Item
-                    leftSection={<IconTrash size="1.5rem" />}
+                    leftSection={<IconTrash size="1.5rem"/>}
                     onClick={async () => {
                       await deleteCourt(tournamentId, court.id);
                       await swrCourtsResponse.mutate();
@@ -187,14 +212,14 @@ function ScheduleColumn({
 }
 
 function Schedule({
-  t,
-  tournament,
-  swrCourtsResponse,
-  stageItemsLookup,
-  matchesLookup,
-  schedule,
-  openMatchModal,
-}: {
+                    t,
+                    tournament,
+                    swrCourtsResponse,
+                    stageItemsLookup,
+                    matchesLookup,
+                    schedule,
+                    openMatchModal,
+                  }: {
   t: Translator;
   tournament: TournamentMinimal;
   swrCourtsResponse: SWRResponse<CourtsResponse>;
@@ -217,7 +242,7 @@ function Schedule({
   ));
 
   columns.push(
-    <div style={{ width: '25rem' }}>
+    <div style={{width: '25rem'}}>
       <CourtModal
         swrCourtsResponse={swrCourtsResponse}
         tournamentId={tournament.id}
@@ -228,7 +253,7 @@ function Schedule({
   if (columns.length < 2) {
     return (
       <Stack align="center">
-        <NoContent title={t('no_courts_title')} description={t('no_courts_description')} />
+        <NoContent title={t('no_courts_title')} description={t('no_courts_description')}/>
         <CourtModal
           swrCourtsResponse={swrCourtsResponse}
           tournamentId={tournament.id}
@@ -249,8 +274,8 @@ export default function SchedulePage() {
   const [modalOpened, modalSetOpened] = useState(false);
   const [match, setMatch] = useState<MatchWithDetails | null>(null);
 
-  const { t } = useTranslation();
-  const { tournamentData } = getTournamentIdFromRouter();
+  const {t} = useTranslation();
+  const {tournamentData} = getTournamentIdFromRouter();
   const swrStagesResponse = getStages(tournamentData.id);
   const swrCourtsResponse = getCourts(tournamentData.id);
 
@@ -299,8 +324,8 @@ export default function SchedulePage() {
                 color="indigo"
                 size="md"
                 variant="filled"
-                style={{ marginBottom: 10 }}
-                leftSection={<IconCalendarPlus size={24} />}
+                style={{marginBottom: 10}}
+                leftSection={<IconCalendarPlus size={24}/>}
                 onClick={async () => {
                   await scheduleMatches(tournamentData.id);
                   await swrStagesResponse.mutate();
@@ -314,7 +339,7 @@ export default function SchedulePage() {
       </Grid>
       <Group grow mt="1rem">
         <DragDropContext
-          onDragEnd={async ({ destination, source, draggableId: matchId }) => {
+          onDragEnd={async ({destination, source, draggableId: matchId}) => {
             if (destination == null || source == null) return;
             await rescheduleMatch(tournamentData.id, +matchId, {
               old_court_id: +source.droppableId,
