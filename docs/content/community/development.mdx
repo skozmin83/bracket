@@ -66,6 +66,19 @@ cd backend
 uv run ./run.sh
 ```
 
+## Build and deploy backend docker image
+```bash
+./bracket/backend$ docker build -t bracket-vko-app .
+./bracket/backend$ docker tag bracket-vko-app kozmin83/bracket-vko-app:latest
+./bracket/backend$ docker push kozmin83/bracket-vko-app:latest
+```
+
+## Build and deploy frontend app
+```bash
+./bracket/frontend$ pnpm build
+./bracket/frontend$ vercel --prod
+```
+
 ### Alternative: running Bracket via process-compose
 
 Alternatively, you can use [process-compose](https://github.com/F1bonacc1/process-compose) to run
