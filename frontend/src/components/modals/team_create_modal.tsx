@@ -18,10 +18,10 @@ export default function TeamCreateModal({
   return (
     <>
       <Modal opened={opened} onClose={() => setOpened(false)} title={t('create_team')}>
-        <Tabs defaultValue="single">
+        <Tabs defaultValue="historical_team_tab">
           <Tabs.List grow>
             <Tabs.Tab value="historical_team_tab" leftSection={<IconClock size={14} />}>
-              {t('historical_team')}
+              {t('historical_team_tab')}
             </Tabs.Tab>
             <Tabs.Tab value="single" leftSection={<IconUser size={14} />}>
               {t('single_team')}
