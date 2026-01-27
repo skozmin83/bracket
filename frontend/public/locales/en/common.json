@@ -275,5 +275,6 @@
     "win_points_input_label": "Points for a win",
     "historical_team_search": "Search for historical team",
     "start_typing_search": "Start typing name...",
-    "historical_team_tab": "Select from history"
+    "historical_team_tab": "Select from history",
+    "place": "Place"
 }

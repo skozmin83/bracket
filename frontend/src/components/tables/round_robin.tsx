@@ -1,6 +1,8 @@
-import { Table, Text, Tooltip, Center } from '@mantine/core';
-import React, { useMemo, useState } from 'react';
-import { IconArrowDown, IconArrowUp, IconArrowsSort } from '@tabler/icons-react';
+import {Center, Table, Text, Tooltip} from '@mantine/core';
+import React, {useMemo, useState} from 'react';
+import {IconArrowDown, IconArrowsSort, IconArrowUp} from '@tabler/icons-react';
+import {capitalize} from "@components/utils/util";
+import {useTranslation} from 'react-i18next';
 
 /* ------------------------------------------------------------------ */
 /* Colors                                                             */
@@ -203,13 +205,13 @@ export default function RoundRobinTable({
       </Table.Th>
     );
   }
-
+  const { t } = useTranslation();
   return (
     <div style={{ overflowX: 'auto' }}>
       <Table withTableBorder withColumnBorders striped>
         <Table.Thead>
           <Table.Tr>
-            <SortHeader label="Player" field="name" />
+            <SortHeader label={capitalize(t('players_title'))} field="name" />
             {orderedPlayers.map((p) => (
               <Table.Th
                 key={p.id}
@@ -226,7 +228,7 @@ export default function RoundRobinTable({
                 </div>
               </Table.Th>
             ))}
-            <SortHeader label="Points" field="points" />
+            <SortHeader label={capitalize(t('points_table_header'))} field="points" />
             <SortHeader label="Place" field="place" />
           </Table.Tr>
         </Table.Thead>

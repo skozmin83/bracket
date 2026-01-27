@@ -11,7 +11,12 @@ import { TableSkeletonSingleColumn } from '@components/utils/skeletons';
 import { TournamentMinimal } from '@components/utils/tournament';
 import { Player, PlayersResponse } from '@openapi';
 import { deletePlayer } from '@services/player';
-import TableLayout, { TableState, ThNotSortable, ThSortable, sortTableEntries } from './table';
+import TableLayout, {
+  TableState,
+  ThNotSortable,
+  ThSortable,
+  sortTableEntries,
+} from './table';
 
 export function WinDistributionTitle() {
   const { t } = useTranslation();
@@ -44,28 +49,41 @@ export default function PlayersTable({
   playerCount: number;
 }) {
   const { t } = useTranslation();
+
   const players: Player[] =
-    swrPlayersResponse.data != null ? swrPlayersResponse.data.data.players : [];
+    swrPlayersResponse.data?.data.players ?? [];
 
-  // const minELOScore = Math.min(...players.map((player) => Number(player.elo_score)));
-  // const maxELOScore = Math.max(...players.map((player) => Number(player.elo_score)));
-  // const maxSwissScore = Math.max(...players.map((player) => Number(player.swiss_score)));
-
-  if (swrPlayersResponse.error) return <RequestErrorAlert error={swrPlayersResponse.error} />;
+  if (swrPlayersResponse.error) {
+    return <RequestErrorAlert error={swrPlayersResponse.error} />;
+  }
 
   if (swrPlayersResponse.isLoading) {
     return <TableSkeletonSingleColumn />;
   }
 
-  const rows = players
-    .sort((p1: Player, p2: Player) => sortTableEntries(p1, p2, tableState))
-    .map((player) => (
+  const sortedPlayers = players.sort((a, b) =>
+    sortTableEntries(a, b, tableState)
+  );
+
+  const rows = sortedPlayers.map((player, index) => {
+    const rowNumber =
+      (tableState.page - 1) * tableState.pageSize + index + 1;
+
+    return (
       <Table.Tr key={player.id}>
+        <Table.Td
+          style={{
+            textAlign: 'center',
+            fontSize: '0.85rem',
+          }}
+        >
+          {rowNumber}
+        </Table.Td>
         <Table.Td>
           {player.active ? (
-            <Badge color="green">Active</Badge>
+            <Badge color="green">{t('active')}</Badge>
           ) : (
-            <Badge color="red">Inactive</Badge>
+            <Badge color="red">{t('inactive')}</Badge>
           )}
         </Table.Td>
         <Table.Td>
@@ -89,15 +107,27 @@ export default function PlayersTable({
           />
         </Table.Td>
       </Table.Tr>
-    ));
+    );
+  });
 
-  if (rows.length < 1) return <NoContent title={t('no_players_title')} />;
+  if (rows.length < 1) {
+    return <NoContent title={t('no_players_title')} />;
+  }
 
   return (
     <>
-      <TableLayout miw={900}>
+      <TableLayout miw={900} style={{ tableLayout: 'fixed' }}>
+        <colgroup>
+          <col style={{ width: 32 }} />
+          <col />
+          <col />
+          <col />
+          <col />
+        </colgroup>
+
         <Table.Thead>
           <Table.Tr>
+            <ThNotSortable style={{ textAlign: 'center' }} />
             <ThSortable state={tableState} field="active">
               {t('status')}
             </ThSortable>
@@ -107,16 +137,18 @@ export default function PlayersTable({
             <ThSortable state={tableState} field="created">
               {t('created')}
             </ThSortable>
-            <ThNotSortable>{null}</ThNotSortable>
+            <ThNotSortable />
           </Table.Tr>
         </Table.Thead>
+
         <Table.Tbody>{rows}</Table.Tbody>
       </TableLayout>
+
       <Center mt="1rem">
         <Pagination
           value={tableState.page}
           onChange={tableState.setPage}
-          total={1 + playerCount / tableState.pageSize}
+          total={Math.ceil(playerCount / tableState.pageSize)}
           size="lg"
         />
       </Center>

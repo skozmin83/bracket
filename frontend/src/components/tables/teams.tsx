@@ -1,45 +1,66 @@
-import { Badge, Center, Pagination, Table } from '@mantine/core';
-import { useTranslation } from 'react-i18next';
-import { SWRResponse } from 'swr';
+import {Badge, Center, Pagination, Table} from '@mantine/core';
+import {useTranslation} from 'react-i18next';
+import {SWRResponse} from 'swr';
 
 import DeleteButton from '@components/buttons/delete';
 import PlayerList from '@components/info/player_list';
 import TeamUpdateModal from '@components/modals/team_update_modal';
-import { NoContent } from '@components/no_content/empty_table_info';
-import { DateTime } from '@components/utils/datetime';
+import {NoContent} from '@components/no_content/empty_table_info';
+import {DateTime} from '@components/utils/datetime';
 import RequestErrorAlert from '@components/utils/error_alert';
-import { TableSkeletonSingleColumn } from '@components/utils/skeletons';
-import { TournamentMinimal } from '@components/utils/tournament';
-import { FullTeamWithPlayers, TeamsWithPlayersResponse } from '@openapi';
-import { deleteTeam } from '@services/team';
-import TableLayout, { TableState, ThNotSortable, ThSortable, sortTableEntries } from './table';
+import {TableSkeletonSingleColumn} from '@components/utils/skeletons';
+import {TournamentMinimal} from '@components/utils/tournament';
+import {FullTeamWithPlayers, TeamsWithPlayersResponse} from '@openapi';
+import {deleteTeam} from '@services/team';
+import TableLayout, {
+  TableState,
+  ThNotSortable,
+  ThSortable,
+  sortTableEntries,
+} from './table';
 
 export default function TeamsTable({
-  tournamentData,
-  swrTeamsResponse,
-  teams,
-  tableState,
-  teamCount,
-}: {
+                                     tournamentData,
+                                     swrTeamsResponse,
+                                     teams,
+                                     tableState,
+                                     teamCount,
+                                   }: {
   tournamentData: TournamentMinimal;
   swrTeamsResponse: SWRResponse<TeamsWithPlayersResponse>;
   teams: FullTeamWithPlayers[];
   tableState: TableState;
   teamCount: number;
 }) {
-  const { t } = useTranslation();
-  if (swrTeamsResponse.error) return <RequestErrorAlert error={swrTeamsResponse.error} />;
+  const {t} = useTranslation();
 
-  if (swrTeamsResponse.isLoading) {
-    return <TableSkeletonSingleColumn />;
+  if (swrTeamsResponse.error) {
+    return <RequestErrorAlert error={swrTeamsResponse.error}/>;
   }
 
-  const rows = teams
-    .sort((p1: FullTeamWithPlayers, p2: FullTeamWithPlayers) =>
-      sortTableEntries(p1, p2, tableState)
-    )
-    .map((team) => (
+  if (swrTeamsResponse.isLoading) {
+    return <TableSkeletonSingleColumn/>;
+  }
+
+  const sortedTeams = teams.sort((a, b) =>
+    sortTableEntries(a, b, tableState)
+  );
+
+  const rows = sortedTeams.map((team, index) => {
+    const rowNumber =
+      (tableState.page - 1) * tableState.pageSize + index + 1;
+
+    return (
       <Table.Tr key={team.id}>
+        <Table.Td
+          style={{
+            textAlign: 'center',
+            fontSize: '0.85rem',
+          }}
+        >
+          {rowNumber}
+        </Table.Td>
+
         <Table.Td>
           {team.active ? (
             <Badge color="green">{t('active')}</Badge>
@@ -49,10 +70,10 @@ export default function TeamsTable({
         </Table.Td>
         <Table.Td>{team.name}</Table.Td>
         <Table.Td>
-          <PlayerList team={team} />
+          <PlayerList team={team}/>
         </Table.Td>
         <Table.Td>
-          <DateTime datetime={team.created} />
+          <DateTime datetime={team.created}/>
         </Table.Td>
         <Table.Td>
           <TeamUpdateModal
@@ -69,15 +90,28 @@ export default function TeamsTable({
           />
         </Table.Td>
       </Table.Tr>
-    ));
+    );
+  });
 
-  if (rows.length < 1) return <NoContent title={t('no_teams_title')} />;
+  if (rows.length < 1) {
+    return <NoContent title={t('no_teams_title')}/>;
+  }
 
   return (
     <>
-      <TableLayout miw={850}>
+      <TableLayout miw={850} style={{tableLayout: 'fixed'}}>
+        <colgroup>
+          <col style={{width: 32}}/>
+          <col/>
+          <col/>
+          <col/>
+          <col/>
+          <col/>
+        </colgroup>
+
         <Table.Thead>
           <Table.Tr>
+            <ThNotSortable style={{textAlign: 'center'}}></ThNotSortable>
             <ThSortable state={tableState} field="active">
               {t('status')}
             </ThSortable>
@@ -88,9 +122,10 @@ export default function TeamsTable({
             <ThSortable state={tableState} field="created">
               {t('created')}
             </ThSortable>
-            <ThNotSortable>{null}</ThNotSortable>
+            <ThNotSortable/>
           </Table.Tr>
         </Table.Thead>
+
         <Table.Tbody>{rows}</Table.Tbody>
       </TableLayout>
 
@@ -98,7 +133,7 @@ export default function TeamsTable({
         <Pagination
           value={tableState.page}
           onChange={tableState.setPage}
-          total={1 + teamCount / tableState.pageSize}
+          total={Math.ceil(teamCount / tableState.pageSize)}
           size="lg"
         />
       </Center>
